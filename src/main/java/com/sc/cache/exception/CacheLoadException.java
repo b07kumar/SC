@@ -1,4 +1,4 @@
-package com.sc.cache;
+package com.sc.cache.exception;
 
 public class CacheLoadException extends RuntimeException{
 

@@ -1,13 +1,12 @@
 package com.sc.scheduler.impl;
 
 import com.sc.scheduler.DeadlineEngine;
+import com.sc.scheduler.bean.ScheduledEvent;
 import org.apache.log4j.Logger;
 
 import java.time.Instant;
-import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Consumer;

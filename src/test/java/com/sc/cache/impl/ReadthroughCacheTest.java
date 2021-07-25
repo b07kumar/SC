@@ -1,7 +1,7 @@
 package com.sc.cache.impl;
 
 import com.sc.cache.Cache;
-import com.sc.cache.CacheLoadException;
+import com.sc.cache.exception.CacheLoadException;
 import com.sc.cache.CacheLoader;
 import org.junit.jupiter.api.Test;
 

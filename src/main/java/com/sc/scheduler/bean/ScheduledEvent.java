@@ -1,4 +1,4 @@
-package com.sc.scheduler.impl;
+package com.sc.scheduler.bean;
 
 import java.util.Objects;
 
