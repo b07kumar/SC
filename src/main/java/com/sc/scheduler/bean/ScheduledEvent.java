@@ -28,21 +28,8 @@ public class ScheduledEvent {
         this.status = status;
     }
 
-    enum ScheduleStatus
+    public enum ScheduleStatus
     {
-        NEW, ERROR, FINISH
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        ScheduledEvent schedule = (ScheduledEvent) o;
-        return id == schedule.id;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id);
+        NEW, TRIGGERED, FINISH
     }
 }

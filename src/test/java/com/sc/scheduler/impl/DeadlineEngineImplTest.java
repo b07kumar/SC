@@ -30,19 +30,30 @@ public class DeadlineEngineImplTest {
     void testPollSingleSchedule() {
         DeadlineEngineImpl engine = new DeadlineEngineImpl();
         long scheduleTime = System.currentTimeMillis();
-        engine.schedule(scheduleTime+1000*10);
-        int count = engine.poll( scheduleTime, l -> System.out.println(l), 10);
+        engine.schedule(scheduleTime);
+        int count = engine.poll( scheduleTime+1000*10, l -> System.out.println(l), 10);
         assertEquals(1, count);
+    }
+
+    @Test
+    void testPollMultipleSchedule() {
+        DeadlineEngineImpl engine = new DeadlineEngineImpl();
+        long scheduleTime = System.currentTimeMillis();
+        engine.schedule(scheduleTime);
+        engine.schedule(scheduleTime+1000*10);
+        engine.schedule(scheduleTime-1000*10);
+        int count = engine.poll( scheduleTime+10, l -> System.out.println(l), 10);
+        assertEquals(2, count);
     }
 
     @Test
     void testPollMultipleScheduleWithLimit() {
         DeadlineEngineImpl engine = new DeadlineEngineImpl();
         long scheduleTime = System.currentTimeMillis();
-        engine.schedule(scheduleTime+1000*10);
-        engine.schedule(scheduleTime+1000*9);
-        engine.schedule(scheduleTime+1000*80);
-        int count = engine.poll( scheduleTime, l -> System.out.println(l), 2);
+        engine.schedule(scheduleTime+1000*2);
+        engine.schedule(scheduleTime+1000*3);
+        engine.schedule(scheduleTime);
+        int count = engine.poll( scheduleTime+1000*8, l -> System.out.println(l), 2);
         assertEquals(2, count);
     }
 
@@ -52,31 +63,14 @@ public class DeadlineEngineImplTest {
         long scheduleTime = System.currentTimeMillis();
         engine.schedule(scheduleTime+1000*10);
         engine.schedule(scheduleTime+1000*9);
-        engine.schedule(scheduleTime+1000*80);
-        engine.poll( scheduleTime, l -> System.out.println(l), 2);
-        int nextCount = engine.poll( scheduleTime, l -> System.out.println(l), 2);
+        engine.schedule(scheduleTime+1000*8);
+        engine.poll( scheduleTime+1000*11, l -> System.out.println(l), 2);
+        int nextCount = engine.poll( scheduleTime+1000*11, l -> System.out.println(l), 2);
         assertEquals(1, nextCount);
     }
 
     @Test
-    void testPollMultipleScheduleWithErrorInConsumer() {
-        DeadlineEngineImpl engine = new DeadlineEngineImpl();
-        long scheduleTime = System.currentTimeMillis();
-        engine.schedule(scheduleTime+1000*10);
-        engine.schedule(scheduleTime+1000*9);
-        engine.schedule(scheduleTime+1000*80);
-        int count = engine.poll( scheduleTime, l ->
-        {
-            if(l <= 2)
-                System.out.println(l);
-            else
-                throw new RuntimeException("Some error");
-        }, 3);
-        assertEquals(2, count);
-    }
-
-    @Test
-    void testCancel() {
+    void testCancel() throws InterruptedException {
         DeadlineEngineImpl engine = new DeadlineEngineImpl();
         long scheduleTime = System.currentTimeMillis();
         CancelConsumer consumer = spy(new CancelConsumer());
@@ -84,9 +78,10 @@ public class DeadlineEngineImplTest {
 
         long id1 = engine.schedule(scheduleTime+1000*10);
         long id2 = engine.schedule(scheduleTime+1000*9);
-        long id3 = engine.schedule(scheduleTime+1000*80);
+        long id3 = engine.schedule(scheduleTime+1000*8);
         engine.cancel(id2);
-        engine.poll( scheduleTime, consumer, 3);
+        engine.poll( scheduleTime+1000*11, consumer, 3);
+        Thread.sleep(5000);
         verify(consumer, times(2)).accept(captor.capture());
         List<Long> actual = captor.getAllValues();
         assertTrue(actual.contains(id1)&&actual.contains(id3));
